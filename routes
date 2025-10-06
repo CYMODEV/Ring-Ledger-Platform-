@@ -1,0 +1,124 @@
+// packages/api/src/routes/users.ts
+import { Router } from "express";
+export const usersRouter = Router();
+
+const users = new Map<string, any>();
+
+usersRouter.post("/", (req, res) => {
+  const id = `usr_${Math.random().toString(36).slice(2)}`;
+  users.set(id, { id, ...req.body, ticker: req.body.ticker ?? id.toUpperCase() });
+  res.json(users.get(id));
+});
+
+usersRouter.get("/:userId", (req, res) => {
+  const u = users.get(req.params.userId);
+  if (!u) return res.status(404).json({ error: "not found" });
+  res.json(u);
+});
+// packages/api/src/routes/assets.ts
+import { Router } from "express";
+import { LedgerService } from "../services/LedgerService";
+export const assetsRouter = Router();
+const ledger = new LedgerService();
+
+assetsRouter.get("/:ownerId", (req, res) => {
+  res.json(ledger.list(req.params.ownerId));
+});
+
+assetsRouter.post("/", (req, res) => {
+  const asset = ledger.add({
+    id: `ast_${Math.random().toString(36).slice(2)}`,
+    ownerId: req.body.ownerId,
+    category: req.body.category,
+    metadataUri: req.body.metadataUri
+  });
+  res.json(asset);
+});
+// packages/api/src/routes/tokenization.ts
+import { Router } from "express";
+import { LedgerService } from "../services/LedgerService";
+import { TokenService } from "../services/TokenService";
+import { CymosIntegrationService } from "../services/CymosIntegrationService";
+
+export const tokenizationRouter = Router();
+const ledger = new LedgerService();
+const tokens = new TokenService();
+const cymos = new CymosIntegrationService();
+
+tokenizationRouter.post("/", async (req, res) => {
+  const { assetId, to, category, metadataUri } = req.body;
+  const tokenId = await tokens.mintAssetNFT(to, category, metadataUri);
+  const updated = ledger.setTokenId(assetId, tokenId);
+  await cymos.notify("asset.minted", { assetId, tokenId, owner: to, category });
+  res.json({ tokenId, asset: updated });
+});
+// packages/api/src/routes/trade.ts
+import { Router } from "express";
+import { MarketService } from "../services/MarketService";
+import { CymosIntegrationService } from "../services/CymosIntegrationService";
+export const tradeRouter = Router();
+
+const market = new MarketService();
+const cymos = new CymosIntegrationService();
+
+tradeRouter.post("/list", async (req, res) => {
+  const { tokenId, price, paymentToken } = req.body;
+  const listing = market.list(tokenId, price, paymentToken);
+  await cymos.notify("market.listed", listing);
+  res.json(listing);
+});
+
+tradeRouter.post("/buy", async (req, res) => {
+  const { listingId, buyer } = req.body;
+  const result = market.buy(listingId, buyer);
+  await cymos.notify("market.purchased", { listingId, buyer });
+  res.json(result);
+});
+// packages/api/src/routes/valuation.ts
+import { Router } from "express";
+import { OracleService } from "../services/OracleService";
+export const valuationRouter = Router();
+const oracle = new OracleService();
+
+valuationRouter.get("/cvi/:ownerId", async (req, res) => {
+  const cvi = await oracle.cviFor(req.params.ownerId);
+  res.json({ ownerId: req.params.ownerId, cvi });
+});
+// packages/api/src/routes/projects.ts
+import { Router } from "express";
+export const projectsRouter = Router();
+
+const projects = new Map<string, any>();
+
+projectsRouter.post("/", (req, res) => {
+  const id = `prj_${Math.random().toString(36).slice(2)}`;
+  const p = { id, name: req.body.name, ticker: req.body.ticker ?? id.toUpperCase(), tags: req.body.tags ?? [] };
+  projects.set(id, p);
+  res.json(p);
+});
+
+projectsRouter.get("/:id", (req, res) => {
+  const p = projects.get(req.params.id);
+  if (!p) return res.status(404).json({ error: "not found" });
+  res.json(p);
+});
+// packages/api/src/routes/ring.ts
+import { Router } from "express";
+import { RingNetworkService } from "../services/RingNetworkService";
+export const ringRouter = Router();
+
+const ring = new RingNetworkService();
+
+ringRouter.post("/nodes", (req, res) => {
+  ring.addNode(req.body.id);
+  res.json({ id: req.body.id });
+});
+
+ringRouter.get("/nodes/:id/neighbors", (req, res) => {
+  res.json({ id: req.params.id, neighbors: ring.neighbors(req.params.id) });
+});
+
+ringRouter.post("/gossip", (req, res) => {
+  const result = ring.gossip(req.body.from, req.body.payload);
+  res.json(result);
+});
