@@ -1,0 +1,107 @@
+// packages/contracts/scripts/deploy.ts
+import { ethers } from "hardhat";
+
+async function main() {
+  const Ring = await ethers.getContractFactory("RingToken");
+  const ring = await Ring.deploy();
+  await ring.waitForDeployment();
+
+  const NFT = await ethers.getContractFactory("AssetNFT");
+  const nft = await NFT.deploy();
+  await nft.waitForDeployment();
+
+  const Market = await ethers.getContractFactory("Marketplace");
+  const market = await Market.deploy();
+  await market.waitForDeployment();
+
+  const Escrow = await ethers.getContractFactory("EscrowVault");
+  const escrow = await Escrow.deploy();
+  await escrow.waitForDeployment();
+
+  const Bridge = await ethers.getContractFactory("RingletBridge");
+  const bridge = await Bridge.deploy();
+  await bridge.waitForDeployment();
+
+  console.log("RING:", await ring.getAddress());
+  console.log("ASSETNFT:", await nft.getAddress());
+  console.log("MARKETPLACE:", await market.getAddress());
+  console.log("ESCROW:", await escrow.getAddress());
+  console.log("BRIDGE:", await bridge.getAddress());
+}
+// packages/api/src/services/LedgerService.ts
+export type AssetCategory = "cognitive" | "physiological" | "biological" | "emotional" | "physical" | "financial" | "natural" | "network";
+
+export interface AssetRecord {
+  id: string;
+  ownerId: string;
+  category: AssetCategory;
+  metadataUri: string;
+  tokenId?: number;
+}
+
+export class LedgerService {
+  private assets: AssetRecord[] = [];
+
+  list(ownerId: string) {
+    return this.assets.filter(a => a.ownerId === ownerId);
+  }
+
+  add(asset: AssetRecord) {
+    this.assets.push(asset);
+    return asset;
+  }
+
+  setTokenId(id: string, tokenId: number) {
+    const a = this.assets.find(x => x.id === id);
+    if (a) a.tokenId = tokenId;
+    return a;
+  }
+}
+// packages/api/src/services/TokenService.ts
+import { cfg } from "../config";
+
+export class TokenService {
+  async mintAssetNFT(to: string, category: string, metadataUri: string): Promise<number> {
+    // Placeholder: connect to contracts via ethers and call AssetNFT.mint
+    console.log("Mint NFT", { to, category, metadataUri, contract: cfg.assetNftAddress });
+    return Math.floor(Math.random() * 1_000_000);
+  }
+}
+// packages/api/src/services/MarketService.ts
+export class MarketService {
+  list(tokenId: number, price: number, paymentToken: string) {
+    console.log("List on-chain", { tokenId, price, paymentToken });
+    return { listingId: Math.floor(Math.random() * 1_000_000), tokenId, price, paymentToken };
+  }
+
+  buy(listingId: number, buyer: string) {
+    console.log("Buy on-chain", { listingId, buyer });
+    return { tx: "0xdeadbeef" };
+  }
+}
+// packages/api/src/services/OracleService.ts
+export class OracleService {
+  async cviFor(ownerId: string): Promise<number> {
+    // Example CVI formula: weighted aggregation of rates and reputation signals
+    const base = 100;
+    const reputation = 25;  // placeholder
+    const demand = 15;      // placeholder
+    return Math.round(base + 0.6 * reputation + 0.4 * demand);
+  }
+}
+// packages/api/src/services/CymosIntegrationService.ts
+import fetch from "node-fetch";
+import { cfg } from "../config";
+
+export class CymosIntegrationService {
+  async notify(event: string, payload: any) {
+    await fetch(cfg.cymosWebhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${cfg.cymosApiKey}`
+      },
+      body: JSON.stringify({ event, payload })
+    }).catch(err => console.error("CYMOS webhook failed", err));
+  }
+}
