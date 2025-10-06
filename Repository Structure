@@ -1,0 +1,69 @@
+ring-ledger/
+├─ README.md
+├─ .env.example
+├─ docker-compose.yml
+├─ packages/
+│  ├─ contracts/              # Solidity smart contracts
+│  │  ├─ contracts/
+│  │  │  ├─ RingToken.sol
+│  │  │  ├─ AssetNFT.sol
+│  │  │  ├─ Marketplace.sol
+│  │  │  ├─ EscrowVault.sol
+│  │  │  ├─ RingletBridge.sol
+│  │  ├─ hardhat.config.ts
+│  │  ├─ scripts/deploy.ts
+│  │  ├─ package.json
+│  ├─ api/                    # Node/TypeScript REST API
+│  │  ├─ src/
+│  │  │  ├─ index.ts
+│  │  │  ├─ app.ts
+│  │  │  ├─ config.ts
+│  │  │  ├─ routes/
+│  │  │  │  ├─ users.ts
+│  │  │  │  ├─ assets.ts
+│  │  │  │  ├─ projects.ts
+│  │  │  │  ├─ trade.ts
+│  │  │  │  ├─ tokenization.ts
+│  │  │  │  ├─ valuation.ts
+│  │  │  │  ├─ ring.ts
+│  │  │  ├─ services/
+│  │  │  │  ├─ RingNetworkService.ts
+│  │  │  │  ├─ LedgerService.ts
+│  │  │  │  ├─ TokenService.ts
+│  │  │  │  ├─ MarketService.ts
+│  │  │  │  ├─ OracleService.ts
+│  │  │  │  ├─ CymosIntegrationService.ts
+│  │  │  ├─ db/
+│  │  │  │  ├─ prisma.schema
+│  │  │  │  ├─ seed.ts
+│  │  ├─ package.json
+│  ├─ web/                    # React/Vite frontend
+│  │  ├─ src/
+│  │  │  ├─ main.tsx
+│  │  │  ├─ App.tsx
+│  │  │  ├─ pages/
+│  │  │  │  ├─ Dashboard.tsx
+│  │  │  │  ├─ Projects.tsx
+│  │  │  │  ├─ Trading.tsx
+│  │  │  │  ├─ USGSMine.tsx
+│  │  │  ├─ components/
+│  │  │  │  ├─ InventoryPanel.tsx
+│  │  │  │  ├─ ValuationPanel.tsx
+│  │  │  │  ├─ MarketplacePanel.tsx
+│  │  │  │  ├─ MonetizationPanel.tsx
+│  │  │  │  ├─ ApiTable.tsx
+│  │  ├─ package.json
+│  ├─ oracles/                # Valuation feeds
+│  │  ├─ src/
+│  │  │  ├─ cviWorker.ts
+│  │  │  ├─ sources/
+│  │  │  │  ├─ rates.ts
+│  │  │  │  ├─ health.ts
+│  │  │  │  ├─ environment.ts
+│  │  ├─ package.json
+│  ├─ tools/                  # Dev tools, lint, CI scripts
+│  │  ├─ ci/
+│  │  │  ├─ validate-env.js
+│  │  │  ├─ run-tests.sh
+│  │  ├─ package.json
+├─ api.openapi.yaml           # API spec
