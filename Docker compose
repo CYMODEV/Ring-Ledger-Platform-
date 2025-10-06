@@ -1,0 +1,42 @@
+# docker-compose.yml
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ring
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ringledger
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+  api:
+    build:
+      context: ./packages/api
+    environment:
+      POSTGRES_URL: postgres://ring:password@db:5432/ringledger
+      JWT_SECRET: changeme
+      CYMOS_WEBHOOK_URL: ${CYMOS_WEBHOOK_URL}
+      CYMOS_API_KEY: ${CYMOS_API_KEY}
+      CHAIN_RPC: http://hardhat:8545
+    depends_on: [db, hardhat]
+    ports:
+      - "4000:4000"
+    command: ["node","dist/index.js"]
+  hardhat:
+    image: node:18
+    working_dir: /contracts
+    volumes:
+      - ./packages/contracts:/contracts
+    command: ["npx","hardhat","node"]
+    ports:
+      - "8545:8545"
+  web:
+    build:
+      context: ./packages/web
+    depends_on: [api]
+    ports:
+      - "5173:5173"
+volumes:
+  dbdata:
