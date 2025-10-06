@@ -1,0 +1,82 @@
+# api.openapi.yaml
+openapi: 3.0.3
+info:
+  title: Ring Ledger API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+paths:
+  /users:
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: OK
+  /users/{userId}:
+    get:
+      summary: Get user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+      responses:
+        "200": { description: OK }
+  /assets:
+    post:
+      summary: Create asset record
+      responses:
+        "200": { description: OK }
+  /assets/{ownerId}:
+    get:
+      summary: List assets
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+      responses:
+        "200": { description: OK }
+  /mint:
+    post:
+      summary: Mint asset NFT
+      responses:
+        "200": { description: OK }
+  /trade/list:
+    post:
+      summary: List NFT for sale
+      responses:
+        "200": { description: OK }
+  /trade/buy:
+    post:
+      summary: Buy listed NFT
+      responses:
+        "200": { description: OK }
+  /valuation/cvi/{ownerId}:
+    get:
+      summary: Get CVI
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+      responses:
+        "200": { description: OK }
+  /ring/nodes:
+    post:
+      summary: Add ring node
+      responses:
+        "200": { description: OK }
+  /ring/nodes/{id}/neighbors:
+    get:
+      summary: Get neighbors
+      parameters:
+        - name: id
+          in: path
+          required: true
+      responses:
+        "200": { description: OK }
+  /ring/gossip:
+    post:
+      summary: Gossip payload to neighbors
+      responses:
+        "200": { description: OK }
