@@ -1,0 +1,59 @@
+// packages/oracles/package.json
+{
+  "name": "@ring-ledger/oracles",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/cviWorker.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "dotenv": "^16.4.1"
+  }
+}
+// packages/oracles/src/sources/rates.js
+export async function marketRates() {
+  // Placeholder: pull rates from external sources
+  return { consultingHourly: 80, fitnessHourly: 40, remediationHourly: 75 };
+}
+// packages/oracles/src/sources/health.js
+export async function healthSignals(userId) {
+  return { vo2max: 45, sleepScore: 80 };
+}
+// packages/oracles/src/sources/environment.js
+export async function envSignals(projectId) {
+  return { waterQualityIndex: 72, soilRemediationIndex: 65 };
+}
+// packages/oracles/src/cviWorker.js
+import dotenv from "dotenv";
+import fetch from "node-fetch";
+import { marketRates } from "./sources/rates.js";
+import { healthSignals } from "./sources/health.js";
+import { envSignals } from "./sources/environment.js";
+dotenv.config();
+
+const API = process.env.API_URL || "http://localhost:4000";
+const POLL = Number(process.env.ORACLE_POLL_MS || 60000);
+
+function cviFormula({ rates, health, env }) {
+  const base = 100;
+  const human = 0.2 * (health.vo2max ?? 0) + 0.3 * (health.sleepScore ?? 0);
+  const environment = 0.3 * (env.waterQualityIndex ?? 0) + 0.2 * (env.soilRemediationIndex ?? 0);
+  const market = 0.5 * (rates.consultingHourly ?? 0) / 100;
+  return Math.round(base + human + environment + market);
+}
+
+async function tick() {
+  const rates = await marketRates();
+  const health = await healthSignals("usr_demo");
+  const env = await envSignals("prj_demo");
+  const cvi = cviFormula({ rates, health, env });
+
+  await fetch(`${API}/valuation/cvi/usr_demo`)
+    .catch(()=>{});
+
+  console.log("CVI update:", cvi);
+}
+
+setInterval(tick, POLL);
+tick();
