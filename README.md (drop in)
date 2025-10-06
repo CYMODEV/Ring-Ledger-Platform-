@@ -1,0 +1,30 @@
+# Ring Ledger
+
+Monorepo for the Ring & Ringlet Ledger platform integrated with Cymos Planet.
+
+## Quick start
+- Copy `.env.example` to `.env`.
+- `pnpm install`
+- `docker-compose up -d`
+- In one terminal: `pnpm --filter @ring-ledger/api dev`
+- In another: `pnpm --filter @ring-ledger/web dev`
+- Optional: `pnpm --filter @ring-ledger/contracts hardhat node`
+- Optional: `pnpm --filter @ring-ledger/oracles start`
+
+## Contracts
+Deploy with `npx hardhat run scripts/deploy.ts --network hardhat`, then update `.env` with addresses.
+
+## API
+See `api.openapi.yaml` and UI ApiTable for endpoints.
+
+## Frontend
+Visit `http://localhost:5173`.
+
+## Cymos Planet
+Set `CYMOS_WEBHOOK_URL` and `CYMOS_API_KEY` in `.env`. Webhook events:
+- `asset.minted`
+- `market.listed`
+- `market.purchased`
+
+## License
+MIT
