@@ -1,0 +1,121 @@
+// packages/web/src/pages/Dashboard.tsx
+import React from "react";
+import { InventoryPanel } from "../components/InventoryPanel";
+import { ValuationPanel } from "../components/ValuationPanel";
+import { MarketplacePanel } from "../components/MarketplacePanel";
+import { MonetizationPanel } from "../components/MonetizationPanel";
+import { ApiTable } from "../components/ApiTable";
+
+export const Dashboard: React.FC = () => {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div>
+        <h2>Welcome</h2>
+        <InventoryPanel items={[
+          { label: "Cognitive", count: 120 },
+          { label: "Physiological", count: 95 },
+          { label: "Biological", count: 100 },
+          { label: "Emotional", count: 150 }
+        ]}/>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <ValuationPanel value={132_500} />
+        <MarketplacePanel ringBalance={250} />
+        <MonetizationPanel hours={320} rate={40} />
+      </div>
+      <div style={{ gridColumn: "1 / span 2" }}>
+        <ApiTable rows={[
+          { method: "GET", endpoint: "/users/{userId}", description: "Retrieves user info" },
+          { method: "GET", endpoint: "/assets", description: "Lists tokenized assets" },
+          { method: "POST", endpoint: "/trade", description: "Initiates asset trade" },
+          { method: "POST", endpoint: "/mint", description: "Tokenizes an asset" }
+        ]}/>
+      </div>
+    </div>
+  );
+};
+// packages/web/src/pages/Projects.tsx
+import React, { useState } from "react";
+import axios from "axios";
+
+export const Projects: React.FC = () => {
+  const [name, setName] = useState("Project Alpha");
+  const [created, setCreated] = useState<any>(null);
+
+  async function create() {
+    const res = await axios.post("http://localhost:4000/projects", { name, tags: ["cognitive","environment"] });
+    setCreated(res.data);
+  }
+
+  return (
+    <div>
+      <h2>Projects</h2>
+      <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Project name"/>
+      <button onClick={create}>Create</button>
+      {created && <pre>{JSON.stringify(created, null, 2)}</pre>}
+    </div>
+  );
+};
+// packages/web/src/pages/Trading.tsx
+import React, { useState } from "react";
+import axios from "axios";
+
+export const Trading: React.FC = () => {
+  const [tokenId, setTokenId] = useState(1);
+  const [price, setPrice] = useState(1000);
+  const [listing, setListing] = useState<any>(null);
+
+  async function list() {
+    const res = await axios.post("http://localhost:4000/trade/list", { tokenId, price, paymentToken: "RING" });
+    setListing(res.data);
+  }
+
+  return (
+    <div>
+      <h2>Trading</h2>
+      <label>Token ID</label>
+      <input type="number" value={tokenId} onChange={e=>setTokenId(Number(e.target.value))}/>
+      <label>Price</label>
+      <input type="number" value={price} onChange={e=>setPrice(Number(e.target.value))}/>
+      <button onClick={list}>List NFT</button>
+      {listing && <pre>{JSON.stringify(listing, null, 2)}</pre>}
+    </div>
+  );
+};
+// packages/web/src/pages/USGSMine.tsx
+import React from "react";
+import { InventoryPanel } from "../components/InventoryPanel";
+import { ValuationPanel } from "../components/ValuationPanel";
+import { MonetizationPanel } from "../components/MonetizationPanel";
+import { ApiTable } from "../components/ApiTable";
+
+export const USGSMine: React.FC = () => {
+  return (
+    <div>
+      <h2>USGS Customer</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div>
+          <div style={{ background: "#1a1a1a", padding: 16, borderRadius: 8 }}>
+            <h3>Project</h3>
+            <div>Abandoned Mine <span style={{ background:"#333", padding:"2px 6px", borderRadius:4 }}>NM-001</span></div>
+          </div>
+          <InventoryPanel items={[
+            { label:"Remediation (NFT)", count: 10 },
+            { label:"Water Quality (NFT)", count: 24 },
+            { label:"Soil (NFT)", count: 12 }
+          ]}/>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <ValuationPanel value={3_600_000} />
+          <MonetizationPanel hours={1_250} rate={75} />
+        </div>
+      </div>
+      <ApiTable rows={[
+        { method: "GET", endpoint: "/projects", description: "Lists projects" },
+        { method: "GET", endpoint: "/assets", description: "Lists tokenized assets" },
+        { method: "POST", endpoint: "/mint", description: "Tokenizes an asset" },
+        { method: "POST", endpoint: "/trade/list", description: "Lists an asset for sale" }
+      ]}/>
+    </div>
+  );
+};
