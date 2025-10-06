@@ -1,0 +1,27 @@
+// packages/api/src/services/RingNetworkService.ts
+type NodeId = string;
+
+export class RingNetworkService {
+  private ring: NodeId[] = [];
+
+  addNode(id: NodeId) {
+    if (!this.ring.includes(id)) this.ring.push(id);
+  }
+
+  removeNode(id: NodeId) {
+    this.ring = this.ring.filter(n => n !== id);
+  }
+
+  neighbors(id: NodeId) {
+    const idx = this.ring.indexOf(id);
+    if (idx === -1 || this.ring.length === 0) return [];
+    const left = this.ring[(idx - 1 + this.ring.length) % this.ring.length];
+    const right = this.ring[(idx + 1) % this.ring.length];
+    return [left, right];
+  }
+
+  gossip<T>(from: NodeId, payload: T) {
+    const [left, right] = this.neighbors(from);
+    return { to: [left, right], payload };
+  }
+}
