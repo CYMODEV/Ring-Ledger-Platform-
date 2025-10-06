@@ -1,0 +1,68 @@
+// packages/web/src/components/InventoryPanel.tsx
+import React from "react";
+
+export const InventoryPanel: React.FC<{ items: {label:string; icon?:string; count?:number}[] }> = ({ items }) => (
+  <div style={{ background: "#1a1a1a", padding: 16, borderRadius: 8 }}>
+    <h3>Inventory</h3>
+    {items.map((i, idx) => (
+      <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #333" }}>
+        <span>{i.icon ?? "•"} {i.label}</span>
+        <span>{i.count ?? 0}</span>
+      </div>
+    ))}
+  </div>
+);
+// packages/web/src/components/ValuationPanel.tsx
+import React from "react";
+
+export const ValuationPanel: React.FC<{ value: number }> = ({ value }) => (
+  <div style={{ background: "#1a1a1a", padding: 16, borderRadius: 8 }}>
+    <h3>Valuation</h3>
+    <div style={{ fontSize: 32, fontWeight: 700 }}>{value.toLocaleString()}</div>
+  </div>
+);
+// packages/web/src/components/MarketplacePanel.tsx
+import React from "react";
+
+export const MarketplacePanel: React.FC<{ ringBalance: number }> = ({ ringBalance }) => (
+  <div style={{ background: "#1a1a1a", padding: 16, borderRadius: 8 }}>
+    <h3>Marketplace</h3>
+    <div>RING → {ringBalance}</div>
+  </div>
+);
+// packages/web/src/components/MonetizationPanel.tsx
+import React from "react";
+
+export const MonetizationPanel: React.FC<{ hours: number; rate: number }> = ({ hours, rate }) => (
+  <div style={{ background: "#1a1a1a", padding: 16, borderRadius: 8 }}>
+    <h3>Monetized</h3>
+    <div style={{ fontSize: 28, fontWeight: 700 }}>{hours} hr</div>
+    <div>${rate}/hr</div>
+  </div>
+);
+// packages/web/src/components/ApiTable.tsx
+import React from "react";
+
+export const ApiTable: React.FC<{ rows: {method:string; endpoint:string; description:string}[] }> = ({ rows }) => (
+  <div style={{ background: "#1a1a1a", padding: 16, borderRadius: 8 }}>
+    <h3>API</h3>
+    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <thead>
+        <tr>
+          <th style={{ borderBottom: "1px solid #333", textAlign: "left" }}>Method</th>
+          <th style={{ borderBottom: "1px solid #333", textAlign: "left" }}>Endpoint</th>
+          <th style={{ borderBottom: "1px solid #333", textAlign: "left" }}>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr key={i}>
+            <td style={{ borderBottom: "1px solid #333" }}>{r.method}</td>
+            <td style={{ borderBottom: "1px solid #333" }}>{r.endpoint}</td>
+            <td style={{ borderBottom: "1px solid #333" }}>{r.description}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
