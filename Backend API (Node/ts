@@ -1,0 +1,29 @@
+// packages/api/src/services/LedgerService.ts
+export type AssetCategory = "cognitive" | "physiological" | "biological" | "emotional" | "physical" | "financial" | "natural" | "network";
+
+export interface AssetRecord {
+  id: string;
+  ownerId: string;
+  category: AssetCategory;
+  metadataUri: string;
+  tokenId?: number;
+}
+
+export class LedgerService {
+  private assets: AssetRecord[] = [];
+
+  list(ownerId: string) {
+    return this.assets.filter(a => a.ownerId === ownerId);
+  }
+
+  add(asset: AssetRecord) {
+    this.assets.push(asset);
+    return asset;
+  }
+
+  setTokenId(id: string, tokenId: number) {
+    const a = this.assets.find(x => x.id === id);
+    if (a) a.tokenId = tokenId;
+    return a;
+  }
+}
